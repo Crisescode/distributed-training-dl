@@ -23,9 +23,9 @@ parser.add_argument('--test-batchsize', '-tb', type=int, default=1000,
                     help='input batch size for testing (default: 1000)')
 parser.add_argument('--epochs', '-e', type=int, default=10,
                     help='number of epochs to train (default: 10)')
-parser.add_argument('--gpu', '-g', type=int, default=0,
+parser.add_argument('--gpu-nums', '-g', type=int, default=0,
                     help='Number of GPU in each mini-batch')
-parser.add_argument('--learning-rate', '--lr', type=float, default=0.1, metavar='LR',
+parser.add_argument('--learning-rate', '-lr', type=float, default=0.1, metavar='LR',
                     help='learning rate (default: 0.1)')
 parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
@@ -35,7 +35,7 @@ parser.add_argument('--log-interval', type=int, default=20, metavar='N',
                     help='how many batches to wait before logging training status')
 parser.add_argument('--save-model', '-sm', action='store_true', default=False,
                     help='For Saving the current Model')
-parser.add_argument('--weight-decay', '--wd', type=float, default=1e-4, metavar='W',
+parser.add_argument('--weight-decay', '-wd', type=float, default=1e-4, metavar='W',
                     help='weight decay(default: 1e-4)')
 args = parser.parse_args()
 
@@ -72,7 +72,7 @@ def main():
         train(epoch, model, criterion, optimizer, train_loader, device)
 
     if args.save_model:
-        torch.save(model.state_dict(), "./single_gpu.pt")
+        torch.save(model.state_dict(), "./single_gpu_model.pt")
 
 
 def train(epoch, model, criterion, optimizer, train_loader, device):
