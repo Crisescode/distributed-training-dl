@@ -67,13 +67,13 @@ python data_parallel.py --gpu-nums 2 --epochs 2 --batch-size 64 --train-dir /hom
 
 * 执行命令：
 
-shell 1:
+Shell 1:
 ```
-CUDA_VISIBLE_DEVICES='0' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/single_node_distribute --dataset-dir /home/crise --log-interval 20  --save-model --world-size 2 --rank 0
+CUDA_VISIBLE_DEVICES='0' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/single_node_distribute --dataset-dir /home/crise/cifar10 --log-interval 20  --save-model --world-size 2 --rank 0
 ```
-同一个节点shell 2 执行:
+同一个节点 Shell 2 执行:
 ```
-CUDA_VISIBLE_DEVICES='1' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/single_node_distribute --dataset-dir /home/crise --log-interval 20  --save-model --world-size 2 --rank 1
+CUDA_VISIBLE_DEVICES='1' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/single_node_distribute --dataset-dir /home/crise/cifar10 --log-interval 20  --save-model --world-size 2 --rank 1
 ```
 
 > 注：简化执行命令可参照单机单卡训练。
