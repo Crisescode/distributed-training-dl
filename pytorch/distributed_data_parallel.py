@@ -14,22 +14,43 @@ from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
 
-parser = argparse.ArgumentParser(description='cifar10 classification models')
-parser.add_argument('--lr', default=0.1, help='')
-parser.add_argument('--batch-size', type=int, default=64, help='')
-parser.add_argument('--max-epochs', type=int, default=4, help='')
+parser = argparse.ArgumentParser(description='PyTorch Cifar10 Distributed Training')
+
+parser.add_argument('--train-dir', '-td', type=str, default="./train_dir",
+                    help='the path that the model saved (default: "./train_dir")')
+parser.add_argument('--batch-size', '-b', type=int, default=64,
+                    help='input batch size for training (default: 64)')
 parser.add_argument('--num-workers', type=int, default=4, help='')
-parser.add_argument("--gpu-devices", type=int, nargs='+', required=False, default=None, help="")
+parser.add_argument('--test-batch-size', '-tb', type=int, default=1000,
+                    help='input batch size for testing (default: 1000)')
+parser.add_argument('--epochs', '-e', type=int, default=10,
+                    help='number of epochs to train (default: 10)')
+parser.add_argument('--gpu-nums', '-g', type=int, default=0,
+                    help='Number of GPU in each mini-batch')
+parser.add_argument('--learning-rate', '--lr', type=float, default=0.1, metavar='LR',
+                    help='learning rate (default: 0.1)')
+parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
+                    help='SGD momentum (default: 0.9)')
+parser.add_argument('--seed', type=int, default=1, metavar='S',
+                    help='random seed (default: 1)')
+parser.add_argument('--log-interval', type=int, default=20, metavar='N',
+                    help='how many batches to wait before logging training status')
+parser.add_argument('--save-model', '-sm', action='store_true', default=False,
+                    help='For Saving the current Model')
+parser.add_argument('--weight-decay', '--wd', type=float, default=1e-4, metavar='W',
+                    help='weight decay(default: 1e-4)')
 parser.add_argument('--init-method', default='tcp://127.0.0.1:13456', type=str, help='')
 parser.add_argument('--dist-backend', default='nccl', type=str, help='')
 parser.add_argument('--rank', default=0, type=int, help='')
 parser.add_argument('--world-size', default=1, type=int, help='')
 parser.add_argument('--distributed', action='store_true', help='')
 
+args = parser.parse_args()
+
 
 def main():
-    args = parser.parse_args()
     ngpus_per_node = torch.cuda.device_count()
+    print("ngpus_per_node: ", ngpus_per_node)
     mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
 
 
@@ -46,7 +67,8 @@ def main_worker(gpu, ngpus_per_node, args):
     net = pyramidnet()
     net.cuda(gpu)
     args.batch_size = int(args.batch_size / ngpus_per_node)
-    # args.num_workers = int(args.num_workers / args.world_size)
+    print("batch_size: ", args.batch_size)
+
     net = torch.nn.parallel.DistributedDataParallel(net, device_ids=[gpu], output_device=gpu)
     num_params = sum(p.numel() for p in net.parameters() if p.requires_grad)
     print('From Rank: {}, The number of parameters of model is'.format(args.rank), num_params)
@@ -62,7 +84,8 @@ def main_worker(gpu, ngpus_per_node, args):
                             transform=transforms_train)
     train_sampler = torch.utils.data.distributed.DistributedSampler(dataset_train)
     train_loader = DataLoader(dataset_train, batch_size=args.batch_size,
-                              shuffle=(train_sampler is None), num_workers=2,
+                              shuffle=(train_sampler is None),
+                              num_workers=args.num_workers,
                               sampler=train_sampler)
 
     criterion = nn.CrossEntropyLoss().cuda(gpu)
@@ -71,13 +94,15 @@ def main_worker(gpu, ngpus_per_node, args):
 
     scheduler = lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)
 
-    for epoch in range(args.max_epochs):
+    for epoch in range(args.epochs):
         train(epoch, net, criterion, optimizer, train_loader, args.rank)
         scheduler.step()
 
     # if args.rank == 0:
-    torch.save(net.module.state_dict(), "final_model_rank_{}.pth".format(args.rank))
-    print("From Rank: {}, model saved.".format(args.rank))
+    if args.save_model:
+        torch.save(net.module.state_dict(),
+                   "distributed_data_parallel_{}.pth".format(args.rank))
+        print("From Rank: {}, model saved.".format(args.rank))
 
 
 def train(epoch, net, criterion, optimizer, train_loader, rank):
@@ -109,11 +134,11 @@ def train(epoch, net, criterion, optimizer, train_loader, rank):
 
         batch_time = time.time() - start
 
-        if batch_idx % 20 == 0:
-            print('From Rank: {}, Epoch:[{}][{}/{}]| '
-                  'loss: {:.3f} | acc: {:.3f} | batch time: {:.3f}s '.format(
-                rank, epoch, batch_idx, len(train_loader),
-                train_loss / (batch_idx + 1), acc, batch_time), flush=True)
+        if batch_idx % args.log_interval == 0:
+            print('From Rank: {}, Epoch:[{}][{}/{}]| loss: {:.3f} | '
+                  'acc: {:.3f} | batch time: {:.3f}s '.format(
+                   rank, epoch, batch_idx, len(train_loader),
+                   train_loss / (batch_idx + 1), acc, batch_time), flush=True)
 
     elapse_time = time.time() - epoch_start
     elapse_time = datetime.timedelta(seconds=elapse_time)

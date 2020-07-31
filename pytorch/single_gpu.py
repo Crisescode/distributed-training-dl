@@ -1,24 +1,21 @@
 import argparse
 import datetime
-import os
 import time
 
 import torch
-import torch.backends.cudnn as cudnn
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
 import torchvision.transforms as transforms
 from model import pyramidnet
-from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
 
-parser = argparse.ArgumentParser(description='PyTorch Cifar10 Distributed Training')
-parser.add_argument('--resume', default=None, help='')
+parser = argparse.ArgumentParser(description='PyTorch Cifar10 Single Gpu Training')
+parser.add_argument('--train-dir', '-td', type=str, default="./train_dir",
+                    help='the path that the model saved (default: "./train_dir")')
 parser.add_argument('--batch-size', '-b', type=int, default=64,
                     help='input batch size for training (default: 64)')
-parser.add_argument('--num_worker', type=int, default=4, help='')
+parser.add_argument('--num-workers', type=int, default=4, help='')
 parser.add_argument('--test-batchsize', '-tb', type=int, default=1000,
                     help='input batch size for testing (default: 1000)')
 parser.add_argument('--epochs', '-e', type=int, default=10,
@@ -41,6 +38,9 @@ args = parser.parse_args()
 
 
 def main():
+    if not args.gpu_nums == 1:
+        raise ValueError("gpu nums must be equal to 1.")
+
     # set run env
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
@@ -55,7 +55,7 @@ def main():
                             transform=transforms_train)
 
     train_loader = DataLoader(dataset_train, batch_size=args.batch_size,
-                              shuffle=True, num_workers=args.num_worker)
+                              shuffle=True, num_workers=args.num_workers)
 
     print('==> Making model..')
 

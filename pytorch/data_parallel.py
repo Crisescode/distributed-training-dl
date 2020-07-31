@@ -4,21 +4,20 @@ import os
 import time
 
 import torch
-import torch.backends.cudnn as cudnn
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
 import torchvision.transforms as transforms
 from model import pyramidnet
-from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
 
-parser = argparse.ArgumentParser(description='PyTorch Cifar10 Distributed Training')
-parser.add_argument('--resume', default=None, help='')
+parser = argparse.ArgumentParser(description='PyTorch Cifar10 Data Parallel Training')
+
+parser.add_argument('--train-dir', '-td', type=str, default="./train_dir",
+                    help='the path that the model saved (default: "./train_dir")')
 parser.add_argument('--batch-size', '-b', type=int, default=64,
                     help='input batch size for training (default: 64)')
-parser.add_argument('--num_worker', type=int, default=4, help='')
+parser.add_argument('--num-workers', type=int, default=4, help='')
 parser.add_argument('--test-batchsize', '-tb', type=int, default=1000,
                     help='input batch size for testing (default: 1000)')
 parser.add_argument('--epochs', '-e', type=int, default=10,
@@ -37,6 +36,7 @@ parser.add_argument('--save-model', '-sm', action='store_true', default=False,
                     help='For Saving the current Model')
 parser.add_argument('--weight-decay', '--wd', type=float, default=1e-4, metavar='W',
                     help='weight decay(default: 1e-4)')
+
 args = parser.parse_args()
 
 
@@ -60,7 +60,7 @@ def main():
                             transform=transforms_train)
 
     train_loader = DataLoader(dataset_train, batch_size=args.batch_size,
-                              shuffle=True, num_workers=args.num_worker)
+                              shuffle=True, num_workers=args.num_workers)
 
     print('==> Making model..')
 
