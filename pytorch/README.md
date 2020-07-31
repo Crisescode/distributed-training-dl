@@ -78,11 +78,11 @@ CUDA_VISIBLE_DEVICES='1' python distributed_data_parallel.py --epochs 2 --batch-
 
 > 注：简化执行命令可参照单机单卡训练。
 
-* 参数介绍：参照单机单卡，新增参数如下。
+* 参数介绍：基本参数参考单机单卡，新增参数如下。
   * --world-size: 启动的进程总数，默认值为1。
   * --rank: 当前进程序号，默认值为0。
 
-* 训练时间：  [训练时长](../imgs/pytorch/single_node_distribute_rank0_time.PNG) 与 [训练时间](../imgs/pytorch/single_node_distribute.PNG)，图中能看出是有两个进程中分别在不同的gpu上进行训练。
+* 训练时间：[训练时长](../imgs/pytorch/single_node_distribute_rank0_time.PNG) 与 [训练时间](../imgs/pytorch/single_node_distribute.PNG)，图中能看出是有两个进程中分别在不同的gpu上进行训练。
   * batch time: 0.274s
   * epoch time: 01:51min
   * gpu0 util: 98%
@@ -90,7 +90,37 @@ CUDA_VISIBLE_DEVICES='1' python distributed_data_parallel.py --epochs 2 --batch-
   
 ### 多机多卡分布式
 多机多卡分布式训练还是主要通过`DistributedDataParallel`接口来实现，
+* 执行命令:
 
+Node 1 & Shell 1 执行：
+```
+CUDA_VISIBLE_DEVICES='0' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/multi_node_distribute --dataset-dir /home/crise --log-interval 20  --save-model --init-method tcp://c1:20201 --world-size 4 --rank 0
+```
+Node 1 & Shell 2 执行：
+```
+CUDA_VISIBLE_DEVICES='1' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/multi_node_distribute --dataset-dir /home/crise --log-interval 20  --save-model --init-method tcp://c1:20201 --world-size 4 --rank 1
+```
+
+Node 2 & Shell 1 执行：
+```
+CUDA_VISIBLE_DEVICES='0' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/multi_node_distribute --dataset-dir /home/crise --log-interval 20  --save-model --init-method tcp://c1:20201 --world-size 4 --rank 2
+```
+
+Node 2 & Shell 2 执行：
+```
+CUDA_VISIBLE_DEVICES='0' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/multi_node_distribute --dataset-dir /home/crise --log-interval 20  --save-model --init-method tcp://c1:20201 --world-size 4 --rank 3
+```
+
+* 参数介绍：基本参数参考单机单卡，新增参数如下。
+  * --world-size: 启动的进程总数，默认值为1。
+  * --rank: 当前进程序号，默认值为0。
+  * --init-method：初始化方式
+
+* 训练时间：[训练时长](../imgs/pytorch/multi_node_distribute_time.PNG) 与 [训练时间](../imgs/pytorch/multi_node_distribute_gpu.PNG)，这只是一个节点GPU截图，另一个节点大差不差。
+  * batch time: 0.301s
+  * epoch time: 01:07min
+  * gpu0 util: 99%
+  * gpu1 util: 99%
 
 ## 性能对比 
 上面几种训练都是在`Tesla P100`，显存为`16Gb`，batch_size 为64 

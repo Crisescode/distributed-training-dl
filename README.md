@@ -7,7 +7,7 @@
 
 ## PyTorch
 
-Pytorch 分布式训练示例参见[README](./pytorch/README.md)。其中包括`nn.DataParallel`实现方式，`nn.parallel.DistributedDataParallel`实现方式以及基于 `SLURM` HPC调度实现。
+Pytorch 分布式训练示例参见[README](./pytorch/README.md)。其中包括[`nn.DataParallel`](./pytorch/data_parallel.py)实现方式，[`nn.parallel.DistributedDataParallel`](./pytorch/distributed_data_parallel.py)实现方式以及基于 `SLURM` HPC调度实现。
 
 ## Chainer
 

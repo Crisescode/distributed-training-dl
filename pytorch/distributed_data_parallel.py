@@ -46,7 +46,6 @@ parser.add_argument('--init-method', default='tcp://127.0.0.1:13456', type=str, 
 parser.add_argument('--dist-backend', default='nccl', type=str, help='')
 parser.add_argument('--rank', default=0, type=int, help='')
 parser.add_argument('--world-size', default=1, type=int, help='')
-parser.add_argument('--distributed', action='store_true', help='')
 
 args = parser.parse_args()
 
