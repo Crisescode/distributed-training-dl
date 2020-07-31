@@ -13,3 +13,8 @@ Pytorch 分布式训练示例参见[README](./pytorch/README.md)。其中包括[
 ## Chainer
 Chainer 分布式训练示例参见[README](./chainer/README.md)
 
+## Mxnet
+Mxnet 分布式训练示例参见[README](./mxnet/README.md)
+
+## Caffe
+Caffe 分布式训练示例参见[README](./caffe/README.md)

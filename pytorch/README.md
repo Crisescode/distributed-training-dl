@@ -1,12 +1,13 @@
 # SingleNode and Distributed Implementation with Pytorch 
 
 ## 介绍
-这个目录主要是`Pytorch`框架的单机以及分布式训练示例。示例是使用`PyramidNet`模型在`cifar10`数据集上进行验证
+这个目录主要是`Pytorch`框架的单机以及分布式训练示例。通过在`cifar10`数据集上训练`PyramidNet`模型进行对比分析`Pytorch`框架单机以及分布式训练性能，
+以帮助读者能够快速上手`PyTorch`框架。
 
-* `model.py`：这个文件主要用以实现模型封装。
-* `single_gpu.py`：这个文件是单机单卡训练脚本。
-* `data_parallel.py`：这个文件是使用`data`进行模型并行的单机多卡训练脚本。
-* `distibuted_data_parallel.py`：这个文件是实现分布式训练，可通过给定不同参数实现单机多卡、多机单卡以及多机多卡分布式训练。
+* [`model.py`](./model.py)：这个文件主要用以实现模型封装。
+* [`single_gpu.py`](./single_gpu.py)：这个文件是单机单卡训练脚本。
+* [`data_parallel.py`](./data_parallel.py)：这个文件是使用`data`进行模型并行的单机多卡训练脚本。
+* [`distibuted_data_parallel.py`](./distributed_data_parallel.py)：这个文件是实现分布式训练，可通过给定不同参数实现单机多卡、多机单卡以及多机多卡分布式训练。
 
 ## Requirements
 * python3.+
