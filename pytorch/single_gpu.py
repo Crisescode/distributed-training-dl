@@ -1,4 +1,4 @@
-import os
+from os import mkdir, path
 import argparse
 import datetime
 import time
@@ -31,7 +31,7 @@ parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--log-interval', type=int, default=20, metavar='N',
+parser.add_argument('--log-interval', '-li', type=int, default=20, metavar='N',
                     help='how many batches to wait before logging training status')
 parser.add_argument('--save-model', '-sm', action='store_true', default=False,
                     help='For Saving the current Model')
@@ -75,12 +75,14 @@ def main():
         train(epoch, model, criterion, optimizer, train_loader, device)
 
     if args.save_model:
-        if not args.train_dir:
-            os.mkdir(args.train_dir)
+        if not path.exists(args.train_dir):
+            mkdir(args.train_dir)
+            print("{} has been maked.".format(args.train_dir))
         torch.save(
             model.state_dict(),
-            os.path.join(args.train_dir, "single_gpu_model.pt")
+            path.join(args.train_dir, "single_gpu_model.pt")
         )
+        print("single gpu model has been saved.")
 
 
 def train(epoch, model, criterion, optimizer, train_loader, device):
