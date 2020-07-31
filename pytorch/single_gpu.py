@@ -1,3 +1,4 @@
+import os
 import argparse
 import datetime
 import time
@@ -12,6 +13,8 @@ from torchvision.datasets import CIFAR10
 
 parser = argparse.ArgumentParser(description='PyTorch Cifar10 Single Gpu Training')
 parser.add_argument('--train-dir', '-td', type=str, default="./train_dir",
+                    help='the path that the model saved (default: "./train_dir")')
+parser.add_argument('--dataset-dir', '-dd', type=str, default="./data",
                     help='the path that the model saved (default: "./train_dir")')
 parser.add_argument('--batch-size', '-b', type=int, default=64,
                     help='input batch size for training (default: 64)')
@@ -38,7 +41,7 @@ args = parser.parse_args()
 
 
 def main():
-    if not args.gpu_nums == 1:
+    if args.gpu_nums > 1:
         raise ValueError("gpu nums must be equal to 1.")
 
     # set run env
@@ -51,7 +54,7 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-    dataset_train = CIFAR10(root='/home/zhaopp5', train=True, download=True,
+    dataset_train = CIFAR10(root=args.dataset_dir, train=True, download=True,
                             transform=transforms_train)
 
     train_loader = DataLoader(dataset_train, batch_size=args.batch_size,
@@ -72,7 +75,12 @@ def main():
         train(epoch, model, criterion, optimizer, train_loader, device)
 
     if args.save_model:
-        torch.save(model.state_dict(), "./single_gpu_model.pt")
+        if not args.train_dir:
+            os.mkdir(args.train_dir)
+        torch.save(
+            model.state_dict(),
+            os.path.join(args.train_dir, "single_gpu_model.pt")
+        )
 
 
 def train(epoch, model, criterion, optimizer, train_loader, device):
