@@ -46,7 +46,7 @@ python single_gpu.py -g 1 -e 2 -b 64 -td /home/crise/single_gpu -dd /home/crise 
 单机多卡有两种实现方式，一种是使用`DataParallel`接口实现数据并行单机多卡分布式训练，另外一个是使用`DistributedDataParallel`接口实现
 
 #### `DataParallel`实现
-这个方式主要是通过单个进程，关于该接口实现详细介绍请参考博客[分布式训练之PyTorch]
+这个方式主要是通过单个进程，关于该接口实现详细介绍请参考博客[分布式训练之PyTorch](https://crisescode.github.io/blog/2020/07/31/%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%AD%E7%BB%83%E4%B9%8BPyTorch/)
 
 * 执行命令：
 ```
@@ -109,7 +109,7 @@ python data_parallel.py --gpu-nums 2 --epochs 2 --batch-size 64 --train-dir /hom
 
   * Node 2 & Shell 2 执行：
     ```
-     CUDA_VISIBLE_DEVICES='0' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/multi_node_distribute --dataset-dir /home/crise --log-interval 20  --save-model --init-method tcp://c1:20201 --world-size 4 --rank 3
+     CUDA_VISIBLE_DEVICES='1' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/multi_node_distribute --dataset-dir /home/crise --log-interval 20  --save-model --init-method tcp://c1:20201 --world-size 4 --rank 3
     ```
   > 注：简化执行命令可参照单机单卡训练。
 
