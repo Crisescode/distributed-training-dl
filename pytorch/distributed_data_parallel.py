@@ -2,6 +2,7 @@ import argparse
 import datetime
 import time
 
+from os import mkdir, path
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
@@ -18,6 +19,8 @@ parser = argparse.ArgumentParser(description='PyTorch Cifar10 Distributed Traini
 
 parser.add_argument('--train-dir', '-td', type=str, default="./train_dir",
                     help='the path that the model saved (default: "./train_dir")')
+parser.add_argument('--dataset-dir', '-dd', type=str, default="./data",
+                    help='the path of dataset (default: "./data")')
 parser.add_argument('--batch-size', '-b', type=int, default=64,
                     help='input batch size for training (default: 64)')
 parser.add_argument('--num-workers', type=int, default=4, help='')
@@ -80,7 +83,7 @@ def main_worker(gpu, ngpus_per_node, args):
         transforms.ToTensor(),
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))])
 
-    dataset_train = CIFAR10(root='/home/zhaopp5', train=True, download=True,
+    dataset_train = CIFAR10(root=args.dataset_dir, train=True, download=True,
                             transform=transforms_train)
     train_sampler = torch.utils.data.distributed.DistributedSampler(dataset_train)
     train_loader = DataLoader(dataset_train, batch_size=args.batch_size,
@@ -94,24 +97,29 @@ def main_worker(gpu, ngpus_per_node, args):
 
     scheduler = lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)
 
-    for epoch in range(args.epochs):
+    for epoch in range(1, args.epochs + 1):
         train(epoch, net, criterion, optimizer, train_loader, args.rank)
         scheduler.step()
 
-    # if args.rank == 0:
     if args.save_model:
-        torch.save(net.module.state_dict(),
-                   "distributed_data_parallel_{}.pth".format(args.rank))
+        if not path.exists(args.train_dir):
+            mkdir(args.train_dir)
+
+        # if args.rank == 0:
+        torch.save(
+            net.module.state_dict(),
+            path.join(
+                args.train_dir,
+                "distributed_data_parallel_{}.pth".format(args.rank)
+            )
+        )
         print("From Rank: {}, model saved.".format(args.rank))
 
 
 def train(epoch, net, criterion, optimizer, train_loader, rank):
     net.train()
 
-    train_loss = 0
-    correct = 0
-    total = 0
-
+    train_loss, correct, total = 0, 0, 0
     epoch_start = time.time()
     for batch_idx, (inputs, targets) in enumerate(train_loader):
         start = time.time()

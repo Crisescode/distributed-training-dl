@@ -71,7 +71,7 @@ def main():
     optimizer = optim.SGD(model.parameters(), lr=args.learning_rate,
                           momentum=args.momentum, weight_decay=args.weight_decay)
 
-    for epoch in range(args.epochs):
+    for epoch in range(1, args.epochs + 1):
         train(epoch, model, criterion, optimizer, train_loader, device)
 
     if args.save_model:
@@ -80,7 +80,7 @@ def main():
 
         torch.save(
             model.state_dict(),
-            path.join(args.train_dir, "single_gpu_model.pt")
+            path.join(args.train_dir, "single_gpu_model.pth")
         )
         print("single gpu model has been saved.")
 
