@@ -65,13 +65,9 @@ def main_worker(gpu, ngpus_per_node, args):
                               shuffle=(train_sampler is None), num_workers=2,
                               sampler=train_sampler)
 
-    # there are 10 classes so the dataset name is cifar-10
-    classes = ('plane', 'car', 'bird', 'cat', 'deer',
-               'dog', 'frog', 'horse', 'ship', 'truck')
-
     criterion = nn.CrossEntropyLoss().cuda(gpu)
-    optimizer = optim.SGD(net.parameters(), lr=args.lr,
-                          momentum=0.9, weight_decay=1e-4)
+    optimizer = optim.SGD(net.parameters(), lr=args.learning_rate,
+                          momentum=args.momentum, weight_decay=args.weight_decay)
 
     scheduler = lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)
 
