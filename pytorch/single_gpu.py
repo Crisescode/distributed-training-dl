@@ -1,7 +1,7 @@
-from os import mkdir, path
 import argparse
 import datetime
 import time
+from os import mkdir, path
 
 import torch
 import torch.nn as nn

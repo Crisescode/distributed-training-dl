@@ -1,7 +1,7 @@
 import argparse
 import datetime
-from os import mkdir, path, environ
 import time
+from os import environ, mkdir, path
 
 import torch
 import torch.nn as nn
