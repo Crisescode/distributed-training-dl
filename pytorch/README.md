@@ -32,7 +32,6 @@ python single_gpu.py -g 1 -e 2 -b 64 -td /home/crise/single_gpu -dd /home/crise 
 
 * 训练时间
   ![img](../imgs/pytorch/sg_time.PNG)
-  ![img](../imgs/pytorch/sg_gpu.PNG)
   * batch time: 0.255s
   * epoch time: 03:20min
   * gpu util: 98%
