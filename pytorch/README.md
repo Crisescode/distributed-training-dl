@@ -31,7 +31,11 @@ python single_gpu.py -g 1 -e 2 -b 64 -td /home/crise/single_gpu -dd /home/crise 
     * --epochs：最大`epoch`数量，默认值为3。
 
 * 训练时间
-  [!img](../imgs/pytorch/sg_time.PNG)
+  ![img](../imgs/pytorch/sg_time.PNG)
+  ![img](../imgs/pytorch/sg_gpu.PNG)
+  * batch time: 0.255s
+  * epoch time: 03:20min
+  * gpu util: 98%
 
 ### 单机多卡
 单机多卡有两种实现方式，一种是使用`DataParallel`接口实现数据并行单机多卡分布式训练，另外一个是使用`DistributedDataParallel`接口实现
