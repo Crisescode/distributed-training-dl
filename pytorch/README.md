@@ -124,6 +124,7 @@ python data_parallel.py --gpu-nums 2 --epochs 2 --batch-size 64 --train-dir /hom
   * gpu1 util: 99%
 
 ## 性能对比 
-上面几种训练都是在`Tesla P100`，显存为`16Gb`，batch_size 为64 
+上面几种训练都是在`Tesla P100-PCIE`，显存为`16Gb`，batch_size 为64，训练5个epoch，总时长对比如下：
+
 
 
