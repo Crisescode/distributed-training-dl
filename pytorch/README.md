@@ -27,11 +27,16 @@ python single_gpu.py --gpu-nums 1 --epochs 2 --batch-size 64 --train-dir /home/c
 python single_gpu.py -g 1 -e 2 -b 64 -td /home/crise/single_gpu -dd /home/crise -li 20  -sm
 ```
 * 参数介绍：
-    * --gpu-nums：使用gpu的数量，其实只能等于1（因为是单卡训练），不然会报`ValueError`，默认值为0。
-    * --epochs：最大`epoch`数量，默认值为3。
+    * --gpu-nums: 使用gpu的数量，其实只能等于1（因为是单卡训练），不然会报`ValueError`，默认值为0。
+    * --epochs: 最大`epoch`数量，默认值为3。
+    * --batch-size: batch size 大小，默认值为64。
+    * --train-dir: 模型参数及结果存放路径，默认值为`./train_dir`。
+    * --dataset-dir: 数据集存放路径，默认值为`./data`。
+    * --log-interval: 日志打印频率，默认值为迭代20步打印一次。
+    * --save-model: 是否需要存储模型，带上这个参数则存，否则不存。
 
 * 训练时间
-  ![img](../imgs/pytorch/sg_time.PNG)
+  本来是想贴图片的，但发现贴上来很难看。可以点击[训练时长](../imgs/pytorch/sg_time.PNG)以及[GPU利用率](../imgs/pytorch/sg_gpu.PNG)查看。
   * batch time: 0.255s
   * epoch time: 03:20min
   * gpu util: 98%
@@ -48,10 +53,17 @@ python data_parallel.py --gpu-nums 2 --epochs 2 --batch-size 64 --train-dir /hom
 ```
 
 * 参数介绍：
+  如上
+
+* 训练时间
+  [训练时长](../imgs/pytorch/data_parallel_time.PNG) 与 [训练时间](../imgs/pytorch/data_parallel_gpu.PNG)，图中能看出在同一个进程中使用了两个gpu进行训练。
+  * batch time: 0.170s
+  * epoch time: 02:18min
+  * gpu util: 80%
 
 
 #### `DistributedDataParallel` 实现
-这个方式
+这个方式会通过`torch.multiprocessing`来启动多个进程，进行
 
 * 执行命令：
 ```
@@ -61,6 +73,7 @@ python single_gpu.py --gpu-nums 1 --epochs 2 --batch-size 64 --train-dir /home/c
 
 * 参数介绍：
 
+* 训练时间
 
 ### 多机多卡分布式
 多机多卡分布式训练还是主要通过`DistributedDataParallel`接口来实现，
