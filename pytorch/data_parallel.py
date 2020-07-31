@@ -1,6 +1,6 @@
 import argparse
 import datetime
-import os
+from os import mkdir, path, environ
 import time
 
 import torch
@@ -15,6 +15,8 @@ parser = argparse.ArgumentParser(description='PyTorch Cifar10 Data Parallel Trai
 
 parser.add_argument('--train-dir', '-td', type=str, default="./train_dir",
                     help='the path that the model saved (default: "./train_dir")')
+parser.add_argument('--dataset-dir', '-dd', type=str, default="./data",
+                    help='the path of dataset (default: "./data")')
 parser.add_argument('--batch-size', '-b', type=int, default=64,
                     help='input batch size for training (default: 64)')
 parser.add_argument('--num-workers', type=int, default=4, help='')
@@ -45,7 +47,7 @@ def main():
     if args.gpu_nums > 1:
         device = 'cuda' if torch.cuda.is_available() else "cpu"
         gpu_ids = ','.join([str(id) for id in range(args.gpu_nums)])
-        os.environ["CUDA_VISIBLE_DEVICES"] = gpu_ids
+        environ["CUDA_VISIBLE_DEVICES"] = gpu_ids
     else:
         raise ValueError("gpu-nums must be greater than 1.")
 
@@ -79,7 +81,14 @@ def main():
         train(epoch, model, criterion, optimizer, train_loader, device)
 
     if args.save_model:
-        torch.save(model.state_dict(), "./data_parallel_model.pt")
+        if not path.exists(args.train_dir):
+            mkdir(args.train_dir)
+
+        torch.save(
+            model.state_dict(),
+            path.join(args.train_dir, "data_parallel_model.pt")
+        )
+        print("data parallel model has been saved.")
 
 
 def train(epoch, model, criterion, optimizer, train_loader, device):

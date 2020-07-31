@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description='PyTorch Cifar10 Single Gpu Trainin
 parser.add_argument('--train-dir', '-td', type=str, default="./train_dir",
                     help='the path that the model saved (default: "./train_dir")')
 parser.add_argument('--dataset-dir', '-dd', type=str, default="./data",
-                    help='the path that the model saved (default: "./train_dir")')
+                    help='the path of dataset (default: "./data")')
 parser.add_argument('--batch-size', '-b', type=int, default=64,
                     help='input batch size for training (default: 64)')
 parser.add_argument('--num-workers', type=int, default=4, help='')
@@ -77,7 +77,7 @@ def main():
     if args.save_model:
         if not path.exists(args.train_dir):
             mkdir(args.train_dir)
-            print("{} has been maked.".format(args.train_dir))
+
         torch.save(
             model.state_dict(),
             path.join(args.train_dir, "single_gpu_model.pt")
