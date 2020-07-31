@@ -66,6 +66,7 @@ python data_parallel.py --gpu-nums 2 --epochs 2 --batch-size 64 --train-dir /hom
 这个方式会通过`torch.multiprocessing`来启动多个进程，进行
 
 * 执行命令：
+
 shell 1:
 ```
 CUDA_VISIBLE_DEVICES='0' python distributed_data_parallel.py --epochs 2 --batch-size 64 --train-dir /home/crise/single_node_distribute --dataset-dir /home/crise --log-interval 20  --save-model --world-size 2 --rank 0
